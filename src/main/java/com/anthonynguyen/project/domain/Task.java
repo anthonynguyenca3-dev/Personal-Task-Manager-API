@@ -16,10 +16,44 @@ public class Task {
     private Priority priority;
     private LocalDate dueDate;
 
-    protected Task() {}
-
     @Enumerated(EnumType.STRING)
     private TaskStatus taskStatus = TaskStatus.TO_DO;
+
+    public Task(String title, Priority priority, LocalDate dueDate) {
+
+        this.title = title;
+        this.priority = priority;
+        this.dueDate = dueDate;
+
+    }
+
+    protected Task() {}
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {this.taskStatus = taskStatus;}
+
+    public String getTitle() {
+        return title;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
 
 }
 
