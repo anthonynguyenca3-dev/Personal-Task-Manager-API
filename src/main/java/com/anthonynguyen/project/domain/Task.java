@@ -55,5 +55,9 @@ public class Task {
         return priority;
     }
 
+    public TaskStatus getTaskStatus() { return taskStatus; }
+
+    public Long getId() {return id; }
+
 }
 

@@ -75,4 +75,16 @@ public class TaskService {
         }
 
     }
+
+    public void deleteTask(long id){
+
+        Optional<Task> taskOptional = taskRepository.findById(id);
+
+        if (taskOptional.isPresent()) {
+
+           taskRepository.deleteById(id);
+
+        }
+
+    }
 }
