@@ -1,4 +1,4 @@
-package com.anthonynguyen.project.repositories;
+package com.anthonynguyen.project.repository;
 
 import com.anthonynguyen.project.domain.Task;
 import org.springframework.data.jpa.repository.JpaRepository;

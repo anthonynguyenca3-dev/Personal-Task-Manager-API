@@ -3,7 +3,7 @@ package com.anthonynguyen.project.service;
 import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.domain.TaskStatus;
-import com.anthonynguyen.project.repositories.TaskRepository;
+import com.anthonynguyen.project.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
