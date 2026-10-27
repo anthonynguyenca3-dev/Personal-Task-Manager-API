@@ -2,6 +2,7 @@ package com.anthonynguyen.project.controller;
 
 import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class TaskController {
     }
 
     @PostMapping("/api/tasks")
-    public ResponseEntity<Task> createTask(@RequestBody Task addTask) {
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task addTask) {
 
         Task task = taskService.createTask(addTask.getTitle(), addTask.getPriority(), addTask.getDueDate());
 

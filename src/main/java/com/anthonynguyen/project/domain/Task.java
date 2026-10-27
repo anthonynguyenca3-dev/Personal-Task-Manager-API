@@ -1,6 +1,9 @@
 package com.anthonynguyen.project.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 
 @Entity
@@ -9,7 +12,9 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    
+
+    @NotBlank(message = "Title must be given.")
+    @Size(max = 100, message = "Title must be at most 100 characters.")
     private String title;
 
     @Enumerated(EnumType.STRING)
