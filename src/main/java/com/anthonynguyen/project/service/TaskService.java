@@ -21,8 +21,25 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<Task> getAllTasks(TaskStatus taskStatus, Priority priority) {
+
+        if (taskStatus != null && priority != null) {
+
+            return taskRepository.findByTaskStatusAndPriority(taskStatus, priority);
+
+        } else if(taskStatus != null) {
+
+            return taskRepository.findByTaskStatus(taskStatus);
+
+        } else if(priority != null){
+
+            return taskRepository.findByPriority(priority);
+
+        } else {
+
+            return taskRepository.findAll();
+        }
+
     }
 
     public Task getTaskById(long id) {

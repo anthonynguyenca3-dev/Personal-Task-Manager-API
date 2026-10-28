@@ -1,6 +1,8 @@
 package com.anthonynguyen.project.controller;
 
+import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.Task;
+import com.anthonynguyen.project.domain.TaskStatus;
 import com.anthonynguyen.project.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,8 +21,8 @@ public class TaskController {
     }
 
     @GetMapping("/api/tasks")
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    public List<Task> getAllTasks(@RequestParam(required = false) TaskStatus taskStatus, @RequestParam(required = false)  Priority priority) {
+        return taskService.getAllTasks(taskStatus, priority);
     }
 
     @GetMapping("/api/tasks/{id}")
