@@ -21,8 +21,8 @@ public class TaskController {
     }
 
     @GetMapping("/api/tasks")
-    public List<Task> getAllTasks(@RequestParam(required = false) TaskStatus taskStatus, @RequestParam(required = false)  Priority priority) {
-        return taskService.getAllTasks(taskStatus, priority);
+    public List<Task> getAllTasks(@RequestParam(required = false) TaskStatus taskStatus, @RequestParam(required = false)  Priority priority, @RequestParam(required = false) Boolean overdue) {
+        return taskService.getAllTasks(taskStatus, priority, overdue);
     }
 
     @GetMapping("/api/tasks/{id}")

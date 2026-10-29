@@ -21,7 +21,27 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks(TaskStatus taskStatus, Priority priority) {
+    public List<Task> getAllTasks(TaskStatus taskStatus, Priority priority, Boolean overdue) {
+
+        if(Boolean.TRUE.equals(overdue)) {
+
+            List<Task> tasks = taskRepository.findByDueDateBeforeAndTaskStatusNot(LocalDate.now(), TaskStatus.COMPLETED);
+
+            if(taskStatus != null) {
+
+                tasks = tasks.stream().filter(task -> task.getTaskStatus() == taskStatus).toList();
+
+            }
+
+            if (priority != null) {
+
+                tasks = tasks.stream().filter(task -> task.getPriority() == priority).toList();
+
+            }
+
+            return tasks;
+
+        }
 
         if (taskStatus != null && priority != null) {
 
