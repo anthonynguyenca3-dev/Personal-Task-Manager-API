@@ -3,13 +3,17 @@ package com.anthonynguyen.project.service;
 import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.domain.TaskStatus;
+import com.anthonynguyen.project.dto.TaskUpdateRequest;
 import com.anthonynguyen.project.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -21,44 +25,60 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks(TaskStatus taskStatus, Priority priority, Boolean overdue) {
+    public List<Task> getAllTasks(TaskStatus taskStatus, Priority priority, Boolean overdue, String sortBy, String sortDirection) {
+
+        List<Task> tasks;
 
         if(Boolean.TRUE.equals(overdue)) {
 
-            List<Task> tasks = taskRepository.findByDueDateBeforeAndTaskStatusNot(LocalDate.now(), TaskStatus.COMPLETED);
+            tasks = taskRepository.findByDueDateBeforeAndTaskStatusNot(LocalDate.now(), TaskStatus.COMPLETED);
 
             if(taskStatus != null) {
 
-                tasks = tasks.stream().filter(task -> task.getTaskStatus() == taskStatus).toList();
+                tasks = tasks.stream().filter(task -> task.getTaskStatus() == taskStatus).collect(Collectors.toCollection(ArrayList::new));
 
             }
 
             if (priority != null) {
 
-                tasks = tasks.stream().filter(task -> task.getPriority() == priority).toList();
+                tasks = tasks.stream().filter(task -> task.getPriority() == priority).collect(Collectors.toCollection(ArrayList::new));
 
             }
 
-            return tasks;
+        } else if (taskStatus != null && priority != null) {
 
-        }
+            tasks = taskRepository.findByTaskStatusAndPriority(taskStatus, priority);
 
-        if (taskStatus != null && priority != null) {
-
-            return taskRepository.findByTaskStatusAndPriority(taskStatus, priority);
 
         } else if(taskStatus != null) {
 
-            return taskRepository.findByTaskStatus(taskStatus);
+            tasks = taskRepository.findByTaskStatus(taskStatus);
 
         } else if(priority != null){
 
-            return taskRepository.findByPriority(priority);
+            tasks = taskRepository.findByPriority(priority);
 
         } else {
 
-            return taskRepository.findAll();
+            tasks = taskRepository.findAll();
+
         }
+
+        if (sortBy != null) {
+
+            if (sortBy.equalsIgnoreCase("priority") && (sortDirection == null || sortDirection.equalsIgnoreCase("ascending"))) {
+
+                tasks.sort(Comparator.comparing(Task::getPriority, Comparator.nullsLast(Comparator.naturalOrder())));
+
+            } else if (sortBy.equalsIgnoreCase("priority") && sortDirection.equalsIgnoreCase("descending")) {
+
+                tasks.sort(Comparator.comparing(Task::getPriority, Comparator.nullsFirst(Comparator.naturalOrder())).reversed());
+
+            }
+
+        }
+
+        return tasks;
 
     }
 
@@ -81,7 +101,7 @@ public class TaskService {
 
     }
 
-    public Task editTask(long id, String title, Priority priority, LocalDate dueDate, TaskStatus taskStatus) {
+    public Task editTask(long id, TaskUpdateRequest editField) {
 
         Optional<Task> taskOptional = taskRepository.findById(id);
 
@@ -89,20 +109,20 @@ public class TaskService {
 
             Task existingTask = taskOptional.get();
 
-            if(title != null) {
-                existingTask.setTitle(title);
+            if(editField.getTitle() != null) {
+                existingTask.setTitle(editField.getTitle());
             }
 
-            if(priority != null) {
-                existingTask.setPriority(priority);
+            if(editField.getPriority() != null) {
+                existingTask.setPriority(editField.getPriority());
             }
 
-            if(dueDate != null) {
-                existingTask.setDueDate(dueDate);
+            if(editField.getDueDate() != null) {
+                existingTask.setDueDate(editField.getDueDate());
             }
 
-            if(taskStatus != null) {
-                existingTask.setTaskStatus(taskStatus);
+            if(editField.getTaskStatus() != null) {
+                existingTask.setTaskStatus(editField.getTaskStatus());
             }
 
             return taskRepository.save(existingTask);

@@ -3,6 +3,7 @@ package com.anthonynguyen.project.controller;
 import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.domain.TaskStatus;
+import com.anthonynguyen.project.dto.TaskUpdateRequest;
 import com.anthonynguyen.project.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,14 @@ public class TaskController {
     }
 
     @GetMapping("/api/tasks")
-    public List<Task> getAllTasks(@RequestParam(required = false) TaskStatus taskStatus, @RequestParam(required = false)  Priority priority, @RequestParam(required = false) Boolean overdue) {
-        return taskService.getAllTasks(taskStatus, priority, overdue);
+    public List<Task> getAllTasks(@RequestParam(required = false) TaskStatus taskStatus,
+                                  @RequestParam(required = false) Priority priority,
+                                  @RequestParam(required = false) Boolean overdue,
+                                  @RequestParam(required = false) String sortBy,
+                                  @RequestParam(required = false, defaultValue = "ascending") String sortDirection) {
+
+        return taskService.getAllTasks(taskStatus, priority, overdue, sortBy, sortDirection);
+
     }
 
     @GetMapping("/api/tasks/{id}")
@@ -46,14 +53,11 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
-    @PutMapping("/api/tasks/{id}")
-    public ResponseEntity<Task> editTask(@PathVariable long id, @RequestBody Task editField) {
+    @PatchMapping("/api/tasks/{id}")
+    public ResponseEntity<Task> editTask(@PathVariable long id, @RequestBody TaskUpdateRequest editField) {
 
-        Task task = taskService.editTask(id
-                , editField.getTitle()
-                , editField.getPriority()
-                , editField.getDueDate()
-                , editField.getTaskStatus());
+        Task task = taskService.editTask(id, editField);
+
 
         if (task != null) {
             return ResponseEntity.ok(task);
