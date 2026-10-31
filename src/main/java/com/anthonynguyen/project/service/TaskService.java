@@ -68,11 +68,11 @@ public class TaskService {
 
             if (sortBy.equalsIgnoreCase("priority") && (sortDirection == null || sortDirection.equalsIgnoreCase("ascending"))) {
 
-                tasks.sort(Comparator.comparing(Task::getPriority, Comparator.nullsLast(Comparator.naturalOrder())));
+                tasks.sort(Comparator.comparing(Task::getPriority, Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Task::getId));
 
             } else if (sortBy.equalsIgnoreCase("priority") && sortDirection.equalsIgnoreCase("descending")) {
 
-                tasks.sort(Comparator.comparing(Task::getPriority, Comparator.nullsFirst(Comparator.naturalOrder())).reversed());
+                tasks.sort(Comparator.comparing(Task::getPriority, Comparator.nullsFirst(Comparator.naturalOrder())).reversed().thenComparing(Task::getId));
 
             }
 
