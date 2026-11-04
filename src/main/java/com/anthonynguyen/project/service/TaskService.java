@@ -3,6 +3,8 @@ package com.anthonynguyen.project.service;
 import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.domain.TaskStatus;
+import com.anthonynguyen.project.dto.TaskRequest;
+import com.anthonynguyen.project.dto.TaskResponse;
 import com.anthonynguyen.project.dto.TaskUpdateRequest;
 import com.anthonynguyen.project.repository.TaskRepository;
 import jakarta.transaction.Transactional;
@@ -25,7 +27,7 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks(TaskStatus taskStatus, Priority priority, Boolean overdue, String sortBy, String sortDirection) {
+    public List<TaskResponse> getAllTasks(TaskStatus taskStatus, Priority priority, Boolean overdue, String sortBy, String sortDirection) {
 
         List<Task> tasks;
 
@@ -78,30 +80,33 @@ public class TaskService {
 
         }
 
-        return tasks;
+        List<TaskResponse> getTasks = tasks.stream().map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPriority(), task.getDueDate(), task.getTaskStatus())).toList();
+
+        return getTasks;
 
     }
 
-    public Task getTaskById(long id) {
+    public TaskResponse getTaskById(long id) {
 
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isPresent()) {
-            return taskOptional.get();
+            return new TaskResponse(taskOptional.get().getId(), taskOptional.get().getTitle(), taskOptional.get().getPriority(), taskOptional.get().getDueDate(), taskOptional.get().getTaskStatus());
         } else {
             return null;
         }
     }
 
-    public Task createTask(String title, Priority priority, LocalDate dueDate) {
+    public TaskResponse createTask(TaskRequest addTask) {
 
-        Task task = new Task(title, priority, dueDate);
+        Task task = new Task(addTask.getTitle(), addTask.getPriority(), addTask.getDueDate());
 
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
 
+        return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getPriority(), savedTask.getDueDate(), savedTask.getTaskStatus());
     }
 
-    public Task editTask(long id, TaskUpdateRequest editField) {
+    public TaskResponse editTask(long id, TaskUpdateRequest editField) {
 
         Optional<Task> taskOptional = taskRepository.findById(id);
 
@@ -125,7 +130,9 @@ public class TaskService {
                 existingTask.setTaskStatus(editField.getTaskStatus());
             }
 
-            return taskRepository.save(existingTask);
+            Task savedTask = taskRepository.save(existingTask);
+
+            return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getPriority(), savedTask.getDueDate(), savedTask.getTaskStatus());
 
         } else {
             return null;

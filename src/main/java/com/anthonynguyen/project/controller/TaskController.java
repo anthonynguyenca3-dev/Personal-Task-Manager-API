@@ -3,6 +3,8 @@ package com.anthonynguyen.project.controller;
 import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.domain.TaskStatus;
+import com.anthonynguyen.project.dto.TaskRequest;
+import com.anthonynguyen.project.dto.TaskResponse;
 import com.anthonynguyen.project.dto.TaskUpdateRequest;
 import com.anthonynguyen.project.service.TaskService;
 import jakarta.validation.Valid;
@@ -22,7 +24,7 @@ public class TaskController {
     }
 
     @GetMapping("/api/tasks")
-    public List<Task> getAllTasks(@RequestParam(required = false) TaskStatus taskStatus,
+    public List<TaskResponse> getAllTasks(@RequestParam(required = false) TaskStatus taskStatus,
                                   @RequestParam(required = false) Priority priority,
                                   @RequestParam(required = false) Boolean overdue,
                                   @RequestParam(required = false) String sortBy,
@@ -33,9 +35,9 @@ public class TaskController {
     }
 
     @GetMapping("/api/tasks/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable long id) {
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable long id) {
 
-        Task task = taskService.getTaskById(id);
+        TaskResponse task = taskService.getTaskById(id);
 
         if (task == null) {
             return ResponseEntity.notFound().build();
@@ -46,18 +48,17 @@ public class TaskController {
     }
 
     @PostMapping("/api/tasks")
-    public ResponseEntity<Task> createTask(@Valid @RequestBody Task addTask) {
+    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest addTask) {
 
-        Task task = taskService.createTask(addTask.getTitle(), addTask.getPriority(), addTask.getDueDate());
+        TaskResponse task = taskService.createTask(addTask);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @PatchMapping("/api/tasks/{id}")
-    public ResponseEntity<Task> editTask(@PathVariable long id, @RequestBody TaskUpdateRequest editField) {
+    public ResponseEntity<TaskResponse> editTask(@PathVariable long id, @RequestBody TaskUpdateRequest editField) {
 
-        Task task = taskService.editTask(id, editField);
-
+        TaskResponse task = taskService.editTask(id, editField);
 
         if (task != null) {
             return ResponseEntity.ok(task);
@@ -70,7 +71,7 @@ public class TaskController {
     @DeleteMapping("/api/tasks/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable long id) {
 
-        Task task = taskService.getTaskById(id);
+        TaskResponse task = taskService.getTaskById(id);
 
         if (task == null) {
             return ResponseEntity.notFound().build();
