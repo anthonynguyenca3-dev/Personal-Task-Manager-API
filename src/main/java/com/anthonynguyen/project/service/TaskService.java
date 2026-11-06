@@ -6,6 +6,7 @@ import com.anthonynguyen.project.domain.TaskStatus;
 import com.anthonynguyen.project.dto.TaskRequest;
 import com.anthonynguyen.project.dto.TaskResponse;
 import com.anthonynguyen.project.dto.TaskUpdateRequest;
+import com.anthonynguyen.project.exception.TaskNotFoundException;
 import com.anthonynguyen.project.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -93,7 +94,7 @@ public class TaskService {
         if (taskOptional.isPresent()) {
             return new TaskResponse(taskOptional.get().getId(), taskOptional.get().getTitle(), taskOptional.get().getPriority(), taskOptional.get().getDueDate(), taskOptional.get().getTaskStatus());
         } else {
-            return null;
+            throw new TaskNotFoundException("Task #" + id + " was not found");
         }
     }
 
@@ -135,7 +136,7 @@ public class TaskService {
             return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getPriority(), savedTask.getDueDate(), savedTask.getTaskStatus());
 
         } else {
-            return null;
+            throw new TaskNotFoundException("Task #" + id + " was not found");
         }
 
     }
@@ -148,6 +149,8 @@ public class TaskService {
 
            taskRepository.deleteById(id);
 
+        } else {
+            throw new TaskNotFoundException("Task #" + id + " was not found");
         }
 
     }

@@ -39,11 +39,7 @@ public class TaskController {
 
         TaskResponse task = taskService.getTaskById(id);
 
-        if (task == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(task);
-        }
+        return ResponseEntity.ok(task);
 
     }
 
@@ -60,11 +56,7 @@ public class TaskController {
 
         TaskResponse task = taskService.editTask(id, editField);
 
-        if (task != null) {
-            return ResponseEntity.ok(task);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(task);
 
     }
 
@@ -73,12 +65,8 @@ public class TaskController {
 
         TaskResponse task = taskService.getTaskById(id);
 
-        if (task == null) {
-            return ResponseEntity.notFound().build();
-        } else {
             taskService.deleteTask(id);
             return ResponseEntity.noContent().build();
-        }
 
     }
 

@@ -24,4 +24,13 @@ public class TaskValidationExceptionHandler {
 
     }
 
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<String> handleNotFoundErrors(TaskNotFoundException error) {
+
+        String errors = error.getMessage();
+
+        return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
+
+    }
+
 }
