@@ -1,7 +1,6 @@
 package com.anthonynguyen.project.controller;
 
 import com.anthonynguyen.project.domain.Priority;
-import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.domain.TaskStatus;
 import com.anthonynguyen.project.dto.TaskRequest;
 import com.anthonynguyen.project.dto.TaskResponse;
@@ -52,7 +51,7 @@ public class TaskController {
     }
 
     @PatchMapping("/api/tasks/{id}")
-    public ResponseEntity<TaskResponse> editTask(@PathVariable long id, @RequestBody TaskUpdateRequest editField) {
+    public ResponseEntity<TaskResponse> editTask(@PathVariable long id, @Valid @RequestBody TaskUpdateRequest editField) {
 
         TaskResponse task = taskService.editTask(id, editField);
 
@@ -63,11 +62,8 @@ public class TaskController {
     @DeleteMapping("/api/tasks/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable long id) {
 
-        TaskResponse task = taskService.getTaskById(id);
-
             taskService.deleteTask(id);
             return ResponseEntity.noContent().build();
 
     }
-
 }

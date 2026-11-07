@@ -1,6 +1,7 @@
 package com.anthonynguyen.project.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -20,6 +21,7 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
+    @FutureOrPresent(message = "Cannot insert a date in the past")
     private LocalDate dueDate;
 
     @Enumerated(EnumType.STRING)

@@ -2,15 +2,21 @@ package com.anthonynguyen.project.dto;
 
 import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.TaskStatus;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
 public class TaskUpdateRequest {
 
+    @Pattern(regexp = ".*\\S.*")
+    @Size(max = 100, message = "Title must be at most 100 characters.")
     private String title;
 
     private Priority priority;
 
+    @FutureOrPresent(message = "Cannot insert a date in the past")
     private LocalDate dueDate;
 
     private TaskStatus taskStatus;
