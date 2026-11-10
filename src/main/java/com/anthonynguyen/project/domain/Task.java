@@ -14,8 +14,8 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "Title must be given.")
-    @Size(max = 100, message = "Title must be at most 100 characters.")
+    @NotBlank(message = "Title must be given")
+    @Size(max = 100, message = "Title must be at most 100 characters")
     private String title;
 
     @Enumerated(EnumType.STRING)
@@ -26,6 +26,10 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     private TaskStatus taskStatus = TaskStatus.TO_DO;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public Task(String title, Priority priority, LocalDate dueDate) {
 
@@ -51,6 +55,10 @@ public class Task {
 
     public void setTaskStatus(TaskStatus taskStatus) {this.taskStatus = taskStatus;}
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -67,5 +75,8 @@ public class Task {
 
     public Long getId() {return id; }
 
+    public User getUser() {
+        return user;
+    }
 }
 
