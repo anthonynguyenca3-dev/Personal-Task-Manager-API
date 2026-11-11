@@ -45,4 +45,8 @@ public class User {
         return password;
     }
 
+    public long getId() {
+        return id;
+    }
+
 }
