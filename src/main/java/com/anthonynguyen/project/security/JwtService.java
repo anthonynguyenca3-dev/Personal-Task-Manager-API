@@ -1,5 +1,7 @@
 package com.anthonynguyen.project.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +41,17 @@ public class JwtService {
             return false;
         }
 
+    }
+
+    public String extractUserId(String token) {
+
+        Jws<Claims> result = Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token);
+
+        Claims claims = result.getPayload();
+
+        String userId = claims.getSubject();
+
+        return userId;
     }
 
 }
