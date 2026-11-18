@@ -17,4 +17,13 @@ public class EmailValidationExceptionHandler {
 
     }
 
+    @ExceptionHandler(AuthenticatedUserNotFoundException.class)
+    public ResponseEntity<String> handleAuthenticatedUserNotFound(AuthenticatedUserNotFoundException notFound) {
+
+        String notFoundMessage = notFound.getMessage();
+
+        return new ResponseEntity<>(notFoundMessage, HttpStatus.UNAUTHORIZED);
+
+    }
+
 }

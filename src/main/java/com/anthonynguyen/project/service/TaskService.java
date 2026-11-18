@@ -3,12 +3,17 @@ package com.anthonynguyen.project.service;
 import com.anthonynguyen.project.domain.Priority;
 import com.anthonynguyen.project.domain.Task;
 import com.anthonynguyen.project.domain.TaskStatus;
+import com.anthonynguyen.project.domain.User;
 import com.anthonynguyen.project.dto.TaskRequest;
 import com.anthonynguyen.project.dto.TaskResponse;
 import com.anthonynguyen.project.dto.TaskUpdateRequest;
+import com.anthonynguyen.project.exception.AuthenticatedUserNotFoundException;
 import com.anthonynguyen.project.exception.TaskNotFoundException;
 import com.anthonynguyen.project.repository.TaskRepository;
+import com.anthonynguyen.project.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,18 +28,22 @@ import java.util.stream.Collectors;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
 
     public List<TaskResponse> getAllTasks(TaskStatus taskStatus, Priority priority, Boolean overdue, String sortBy, String sortDirection) {
+
+        Long userId = getAuthenticatedUserId();
 
         List<Task> tasks;
 
         if(Boolean.TRUE.equals(overdue)) {
 
-            tasks = taskRepository.findByDueDateBeforeAndTaskStatusNot(LocalDate.now(), TaskStatus.COMPLETED);
+            tasks = taskRepository.findByUser_IdAndDueDateBeforeAndTaskStatusNot(userId, LocalDate.now(), TaskStatus.COMPLETED);
 
             if(taskStatus != null) {
 
@@ -50,20 +59,20 @@ public class TaskService {
 
         } else if (taskStatus != null && priority != null) {
 
-            tasks = taskRepository.findByTaskStatusAndPriority(taskStatus, priority);
+            tasks = taskRepository.findByUser_IdAndTaskStatusAndPriority(userId, taskStatus, priority);
 
 
         } else if(taskStatus != null) {
 
-            tasks = taskRepository.findByTaskStatus(taskStatus);
+            tasks = taskRepository.findByUser_IdAndTaskStatus(userId, taskStatus);
 
         } else if(priority != null){
 
-            tasks = taskRepository.findByPriority(priority);
+            tasks = taskRepository.findByUser_IdAndPriority(userId, priority);
 
         } else {
 
-            tasks = taskRepository.findAll();
+            tasks = taskRepository.findByUser_Id(userId);
 
         }
 
@@ -89,7 +98,9 @@ public class TaskService {
 
     public TaskResponse getTaskById(long id) {
 
-        Optional<Task> taskOptional = taskRepository.findById(id);
+        Long userId = getAuthenticatedUserId();
+
+        Optional<Task> taskOptional = taskRepository.findByIdAndUser_Id(id, userId);
 
         if (taskOptional.isPresent()) {
             return new TaskResponse(taskOptional.get().getId(), taskOptional.get().getTitle(), taskOptional.get().getPriority(), taskOptional.get().getDueDate(), taskOptional.get().getTaskStatus());
@@ -100,7 +111,19 @@ public class TaskService {
 
     public TaskResponse createTask(TaskRequest addTask) {
 
+        Long userId = getAuthenticatedUserId();
+        Optional<User> userOptional = userRepository.findById(userId);
+        User user;
+
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+        } else {
+            throw new AuthenticatedUserNotFoundException("Authenticated user account could not be found");
+        }
+
         Task task = new Task(addTask.getTitle(), addTask.getPriority(), addTask.getDueDate());
+
+        task.setUser(user);
 
         Task savedTask = taskRepository.save(task);
 
@@ -109,7 +132,9 @@ public class TaskService {
 
     public TaskResponse editTask(long id, TaskUpdateRequest editField) {
 
-        Optional<Task> taskOptional = taskRepository.findById(id);
+        Long userId = getAuthenticatedUserId();
+
+        Optional<Task> taskOptional = taskRepository.findByIdAndUser_Id(id, userId);
 
         if (taskOptional.isPresent()) {
 
@@ -143,15 +168,30 @@ public class TaskService {
 
     public void deleteTask(long id){
 
-        Optional<Task> taskOptional = taskRepository.findById(id);
+        Long userId = getAuthenticatedUserId();
+
+        Optional<Task> taskOptional = taskRepository.findByIdAndUser_Id(id, userId);
 
         if (taskOptional.isPresent()) {
 
-           taskRepository.deleteById(id);
+            Task existingTask = taskOptional.get();
+            taskRepository.delete(existingTask);
 
         } else {
             throw new TaskNotFoundException("Task #" + id + " was not found");
         }
+
+    }
+
+    private Long getAuthenticatedUserId() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Object principal = authentication.getPrincipal();
+
+        Long userId = Long.valueOf((String)principal);
+
+        return userId;
 
     }
 }
