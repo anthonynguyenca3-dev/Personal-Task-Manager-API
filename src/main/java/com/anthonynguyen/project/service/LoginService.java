@@ -6,6 +6,8 @@ import com.anthonynguyen.project.dto.LoginResponse;
 import com.anthonynguyen.project.repository.UserRepository;
 import com.anthonynguyen.project.security.JwtService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,8 @@ import java.util.Optional;
 @Service
 @Transactional
 public class LoginService {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -42,6 +46,8 @@ public class LoginService {
         Long id = user.getId();
 
         String token = jwtService.generateToken(id);
+
+        logger.info("User #{} logged in successfully", id);
 
         return new LoginResponse(id, email, token);
 

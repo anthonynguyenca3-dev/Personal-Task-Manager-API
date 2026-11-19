@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class TaskService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
@@ -127,6 +131,8 @@ public class TaskService {
 
         Task savedTask = taskRepository.save(task);
 
+        logger.info("Task #{} created successfully", savedTask.getId());
+
         return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getPriority(), savedTask.getDueDate(), savedTask.getTaskStatus());
     }
 
@@ -158,6 +164,8 @@ public class TaskService {
 
             Task savedTask = taskRepository.save(existingTask);
 
+            logger.info("Task #{} was updated successfully", savedTask.getId());
+
             return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getPriority(), savedTask.getDueDate(), savedTask.getTaskStatus());
 
         } else {
@@ -176,6 +184,8 @@ public class TaskService {
 
             Task existingTask = taskOptional.get();
             taskRepository.delete(existingTask);
+
+            logger.info("Task #{} was deleted successfully", id);
 
         } else {
             throw new TaskNotFoundException("Task #" + id + " was not found");

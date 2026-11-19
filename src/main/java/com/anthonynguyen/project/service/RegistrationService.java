@@ -6,6 +6,8 @@ import com.anthonynguyen.project.dto.RegistrationResponse;
 import com.anthonynguyen.project.exception.EmailAlreadyExistsException;
 import com.anthonynguyen.project.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +15,9 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class RegistrationService {
 
-    private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
 
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     public RegistrationService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -34,10 +37,10 @@ public class RegistrationService {
 
         User savedUser = userRepository.save(user);
 
+        logger.info("User #{} registered successfully", savedUser.getId());
+
         return new RegistrationResponse(savedUser.getId(), savedUser.getEmail());
 
     }
-
-
 
 }
